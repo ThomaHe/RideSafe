@@ -33,6 +33,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import io.realm.Realm;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleMap.OnMapLongClickListener {
@@ -40,6 +42,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
+
+    private Realm realm;
+    public Marker selectedMarker;
 
     private View bottomSheet;
     private BottomSheetBehavior behavior;
@@ -61,6 +66,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         ButterKnife.bind(this);
+        realm=Realm.getDefaultInstance();
+
         getSupportActionBar().show();
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -86,9 +93,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 switch (newState) {
                     case BottomSheetBehavior.STATE_HIDDEN:
                         add_fab.setVisibility(View.GONE);
-                        break;
-                    case BottomSheetBehavior.STATE_COLLAPSED:
-                        add_fab.setVisibility(View.VISIBLE);
                         break;
                 }
             }
@@ -195,18 +199,34 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public boolean onMarkerClick(Marker marker) {
         behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         title_sheet.setText(marker.getTitle());
-        if(marker.getTitle()!="Nouveau"){
-            add_fab.setVisibility(View.GONE);
+        if(marker.getTitle().equals("Nouveau")){  // nouveau marqueur ajouté par l'utilisateur
+            add_fab.setVisibility(View.VISIBLE);
+            selectedMarker=marker;                // pour envoyer avec le bouton +
+            desc_sheet.setText("Appuyez sur le + pour ajouter une nouvelle zone de danger ");
         }
-        if(marker.getSnippet()!= null){
-        desc_sheet.setText(marker.getSnippet());}
-        else {
-            desc_sheet.setText("Appuyez sur le + pour ajouter une nouvelle zone de danger ");}
+        else{                                    // marqueur de la BDD
+            add_fab.setVisibility(View.GONE);
+            if(marker.getSnippet()!= null){
+                desc_sheet.setText(marker.getSnippet());}
+        }
+
         return true;
     }
 
+    @OnClick(R.id.add_fab)  // appui sur le bouton +
+    public void submit(){
+        Intent intent = new Intent(MapsActivity.this, FormActivity.class);
+        Bundle extras = new Bundle();
+        extras.putDouble("latitude",selectedMarker.getPosition().latitude);
+        extras.putDouble("longitude",selectedMarker.getPosition().longitude);
+        intent.putExtras(extras);
+        startActivity(intent);
+
+    }
+
+
     @Override
-    public void onMapLongClick(LatLng latLng) {
+    public void onMapLongClick(LatLng latLng) {    // ajout d'un nouveau marqueur sur la carte
         mMap.addMarker(new MarkerOptions()
                 .position(latLng)
                 .title("Nouveau")
@@ -233,6 +253,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    public void generateMap(){
+
+
+    }
 
 
 }

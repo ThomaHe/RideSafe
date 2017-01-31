@@ -1,6 +1,7 @@
 package com.example.thenry.ridesafe;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by thenry on 27/01/2017.
@@ -8,6 +9,7 @@ import io.realm.RealmObject;
 
 public class Zone extends RealmObject {
 
+    @PrimaryKey
     public int id;
     public String title;
     public String description;
