@@ -11,6 +11,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,6 +36,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleMap.OnMapLongClickListener {
@@ -48,9 +50,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private View bottomSheet;
     private BottomSheetBehavior behavior;
-    @BindView(R.id.title_sheet) TextView title_sheet;
-    @BindView(R.id.desc_sheet) TextView desc_sheet;
-    @BindView(R.id.add_fab)  FloatingActionButton add_fab;
+    @BindView(R.id.title_sheet)
+    TextView title_sheet;
+    @BindView(R.id.desc_sheet)
+    TextView desc_sheet;
+    @BindView(R.id.add_fab)
+    FloatingActionButton add_fab;
 
 
     // variables pour la mise à jour de la localisation
@@ -66,7 +71,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         ButterKnife.bind(this);
-        realm=Realm.getDefaultInstance();
+        realm = Realm.getDefaultInstance();
 
         getSupportActionBar().show();
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -87,7 +92,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         behavior = BottomSheetBehavior.from(bottomSheet);
         behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
-        behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback(){
+        behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                 switch (newState) {
@@ -96,6 +101,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         break;
                 }
             }
+
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
 
@@ -122,7 +128,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onResume() {
         super.onResume();
-
+        // on cache la bottom sheet quand on revient sur l'activité
+        CoordinatorLayout coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator);
+        bottomSheet = coordinatorLayout.findViewById(R.id.bottom_sheet);
+        behavior = BottomSheetBehavior.from(bottomSheet);
+        behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
     /**
@@ -140,8 +150,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setMyLocationEnabled(true);
         mMap.setOnMarkerClickListener(this);
         mMap.setOnMapLongClickListener(this);
-    }
 
+        generateMap();
+    }
 
 
     @Override
@@ -157,6 +168,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             Intent newIntent = new Intent(this, ProposActivity.class);
             startActivity(newIntent);
         }
+        if (id == R.id.action_updateMap) {
+            mMap.clear();
+            generateMap();
+        }
         return true;
     }
 
@@ -166,14 +181,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             //demande permission localisation
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_ASK_PERMISSIONS);
 
-        }
-        else{ // localisation déja autorisée
+        } else { // localisation déja autorisée
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             LatLng currentloc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
             mMap.addMarker(new MarkerOptions().position(currentloc).title("Ici").snippet("Danger !! Zone de grosse merde"));
-            mMap.addMarker(new MarkerOptions().position(new LatLng(45.775801,4.857337)).title("Parc").snippet("Roseraie, ici ça sent bon"));
-            mMap.addMarker(new MarkerOptions().position(new LatLng(45.773860,4.859770)).title("Botanic").snippet("Viens acheter un lapin"));
-            mMap.addMarker(new MarkerOptions().position(new LatLng(45.783825,4.869003)).title("CPE").snippet("C'était quand même bien"));
+            mMap.addMarker(new MarkerOptions().position(new LatLng(45.775801, 4.857337)).title("Parc").snippet("Roseraie, ici ça sent bon"));
+            mMap.addMarker(new MarkerOptions().position(new LatLng(45.773860, 4.859770)).title("Botanic").snippet("Viens acheter un lapin"));
+            mMap.addMarker(new MarkerOptions().position(new LatLng(45.783825, 4.869003)).title("CPE").snippet("C'était quand même bien"));
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentloc, 15));
         }
 
@@ -187,9 +201,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 LatLng currentloc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
                 mMap.addMarker(new MarkerOptions().position(currentloc).title("Ici"));
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentloc, 12));
-            }
-            else {
-                Toast.makeText(getApplicationContext(),"Sans localisation l'application ne peut pas fonctionner",Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Sans localisation l'application ne peut pas fonctionner", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -199,26 +212,26 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public boolean onMarkerClick(Marker marker) {
         behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         title_sheet.setText(marker.getTitle());
-        if(marker.getTitle().equals("Nouveau")){  // nouveau marqueur ajouté par l'utilisateur
+        if (marker.getTitle().equals("Nouveau")) {  // nouveau marqueur ajouté par l'utilisateur
             add_fab.setVisibility(View.VISIBLE);
-            selectedMarker=marker;                // pour envoyer avec le bouton +
+            selectedMarker = marker;                // pour envoyer avec le bouton +
             desc_sheet.setText("Appuyez sur le + pour ajouter une nouvelle zone de danger ");
-        }
-        else{                                    // marqueur de la BDD
+        } else {                                    // marqueur de la BDD
             add_fab.setVisibility(View.GONE);
-            if(marker.getSnippet()!= null){
-                desc_sheet.setText(marker.getSnippet());}
+            if (marker.getSnippet() != null) {
+                desc_sheet.setText(marker.getSnippet());
+            }
         }
 
         return true;
     }
 
     @OnClick(R.id.add_fab)  // appui sur le bouton +
-    public void submit(){
+    public void submit() {
         Intent intent = new Intent(MapsActivity.this, FormActivity.class);
         Bundle extras = new Bundle();
-        extras.putDouble("latitude",selectedMarker.getPosition().latitude);
-        extras.putDouble("longitude",selectedMarker.getPosition().longitude);
+        extras.putDouble("latitude", selectedMarker.getPosition().latitude);
+        extras.putDouble("longitude", selectedMarker.getPosition().longitude);
         intent.putExtras(extras);
         startActivity(intent);
 
@@ -253,8 +266,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    public void generateMap(){
-
+    public void generateMap() {
+        RealmResults<Zone> allZones = realm.where(Zone.class).findAll();
+        try {
+            for (Zone zone : allZones) {
+                LatLng latLng = new LatLng(zone.getLatitude(), zone.getLongitude());
+                mMap.addMarker(new MarkerOptions().position(latLng).title(String.valueOf(zone.getId())));
+            }
+        }catch (NullPointerException e){
+            Log.e("NULL", "Pas de zones à afficher");
+        }
 
     }
 
