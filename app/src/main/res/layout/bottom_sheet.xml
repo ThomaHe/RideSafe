@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="335dp"
+    android:background="@android:color/white"
     android:orientation="vertical"
     app:behavior_hideable="true"
     app:behavior_peekHeight="70dp"
-    android:background="@android:color/white"
     app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
     <FrameLayout
@@ -21,18 +22,46 @@
 
             <TextView
                 android:id="@+id/title_sheet"
+                style="@style/TextAppearance.AppCompat.Headline"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="24dp"
-                style="@style/TextAppearance.AppCompat.Headline"/>
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp" />
 
-            <View style="@style/Divider" />
-
-            <TextView
-                android:id="@+id/desc_sheet"
-                android:layout_marginLeft="24dp"
+            <android.support.v7.widget.CardView
+                android:id="@+id/bottom_cardView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="250dp"
+                android:layout_gravity="center"
+                android:layout_margin="15dp"
+                card_view:cardCornerRadius="2dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:id="@+id/desc_sheet"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:gravity="center"
+                        android:layout_centerHorizontal="true"/>
+
+                    <Button
+                        android:id="@+id/btn_signal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerHorizontal="true"
+                        android:text="Zone disparue"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
 
         </LinearLayout>
 

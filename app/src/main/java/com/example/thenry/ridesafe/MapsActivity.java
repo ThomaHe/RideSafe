@@ -172,6 +172,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mMap.clear();
             generateMap();
         }
+        if (id == R.id.action_deleteRealm)  // à virer avant la prod
+        {
+
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    realm.deleteAll();
+                }
+            });
+
+        }
         return true;
     }
 

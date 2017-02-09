@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+
+    <item android:id="@+id/action_deleteRealm"
+        android:title="Supprimer Realm"
+        android:icon="@drawable/ic_delete"
+        app:showAsAction="always"/>
+
     <item android:id="@+id/action_updateMap"
         android:title="Actualiser carte"
         android:icon="@drawable/ic_sync"
