@@ -43,9 +43,14 @@
                 android:padding="5dp" />
 
             <TextView
-                android:id="@+id/lat"
+                android:id="@+id/form_address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/lat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"/>
 
             <TextView
                 android:id="@+id/longi"

@@ -12,17 +12,20 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 public class FormActivity extends AppCompatActivity {
 
-    @BindView(R.id.lat)TextView txt_lat;
-    @BindView(R.id.longi)TextView text_longi;
     @BindView(R.id.form_title)EditText form_title;
     @BindView(R.id.form_desc)EditText form_desc;
+    @BindView(R.id.form_address)TextView form_address;
+    @BindView(R.id.lat)TextView form_lat;
+    @BindView(R.id.longi)TextView form_longi;
 
     private Realm realm;
     private double latitude;
     private double longitude;
+    private String address;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,14 +33,21 @@ public class FormActivity extends AppCompatActivity {
         setContentView(R.layout.activity_form);
         getSupportActionBar().show();
         ButterKnife.bind(this);
-        realm=Realm.getDefaultInstance();
+
+        RealmConfiguration config = new RealmConfiguration  // a modifier une fois que l'appli part en prod, il faudra fournir une migration
+                .Builder()
+                .deleteRealmIfMigrationNeeded()
+                .build();
+        realm = Realm.getInstance(config);
 
         Bundle extras = getIntent().getExtras();
         latitude = extras.getDouble("latitude");
         longitude = extras.getDouble("longitude");
+        address = extras.getString("address");
 
-        txt_lat.setText("Latitude : " + latitude);
-        text_longi.setText("Longitude : " + longitude);
+        form_address.setText("Adresse : " + address);
+        form_lat.setText("Latitude : " + latitude);
+        form_longi.setText("Longitude : " + longitude);
 
     }
 
@@ -51,6 +61,7 @@ public class FormActivity extends AppCompatActivity {
         newZone.setId(getNextPrimaryKey());
         newZone.setTitle(form_title.getText().toString());
         newZone.setDescription(form_desc.getText().toString());
+        newZone.setAddress(address);
         newZone.setLatitude(latitude);
         newZone.setLongitude(longitude);
         newZone.setDate(date);

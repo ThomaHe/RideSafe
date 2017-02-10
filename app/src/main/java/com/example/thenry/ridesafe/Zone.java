@@ -15,6 +15,7 @@ public class Zone extends RealmObject {
     public String description;
     public double latitude;
     public double longitude;
+    public String address;
     public String date;
     public int count_delete;
 
@@ -56,6 +57,14 @@ public class Zone extends RealmObject {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getDate() {

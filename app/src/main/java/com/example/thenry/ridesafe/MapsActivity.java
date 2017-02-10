@@ -1,5 +1,6 @@
 package com.example.thenry.ridesafe;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -19,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +46,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleApiClient.ConnectionCallbacks,
@@ -52,18 +55,26 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
+    public Context ctx;
+    public MapsController mapsController;
 
     private Realm realm;
     public Marker selectedMarker;
+    public Zone selectedZone;
 
     private View bottomSheet;
     private BottomSheetBehavior behavior;
-    @BindView(R.id.title_sheet)
-    TextView title_sheet;
-    @BindView(R.id.desc_sheet)
-    TextView desc_sheet;
     @BindView(R.id.add_fab)
     FloatingActionButton add_fab;
+    @BindView(R.id.title_sheet)
+    TextView sheet_title;
+    @BindView(R.id.desc_sheet)
+    TextView sheet_desc;
+    @BindView(R.id.address_sheet)
+    TextView sheet_address;
+    @BindView(R.id.btn_signal)
+    Button btn_signal;
+
     @BindView(R.id.address_search)
     EditText address_search;
 
@@ -81,7 +92,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         ButterKnife.bind(this);
-        realm = Realm.getDefaultInstance();
+
+        RealmConfiguration config = new RealmConfiguration  // a modifier une fois que l'appli part en prod, il faudra fournir une migration
+                .Builder()
+                .deleteRealmIfMigrationNeeded()
+                .build();
+        realm = Realm.getInstance(config);
+        ctx = MapsActivity.this;
+        mapsController = new MapsController(realm);
 
         getSupportActionBar().show();
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -108,6 +126,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 switch (newState) {
                     case BottomSheetBehavior.STATE_HIDDEN:
                         add_fab.setVisibility(View.GONE);
+                        break;
+                    case BottomSheetBehavior.STATE_COLLAPSED:
+                        sheet_address.setVisibility(View.GONE);
+                        break;
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        sheet_address.setVisibility(View.VISIBLE);
+                        break;
+                    case BottomSheetBehavior.STATE_EXPANDED:
+                        sheet_address.setVisibility(View.VISIBLE);
                         break;
                 }
             }
@@ -241,17 +268,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else { // localisation déja autorisée
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             LatLng currentloc = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(currentloc).title("Ici").snippet("Danger !! Zone de grosse merde"));
-            mMap.addMarker(new MarkerOptions().position(new LatLng(45.775801, 4.857337)).title("Parc").snippet("Roseraie, ici ça sent bon"));
-            mMap.addMarker(new MarkerOptions().position(new LatLng(45.773860, 4.859770)).title("Botanic").snippet("Viens acheter un lapin"));
-            mMap.addMarker(new MarkerOptions().position(new LatLng(45.783825, 4.869003)).title("CPE").snippet("C'était quand même bien"));
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentloc, 15));
         }
 
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) { // executée à la réponse positive de l'autorisation de localisation
         if (requestCode == 123) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
@@ -264,20 +287,29 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-
+    // sert à afficher la bottom sheet et la remplir
     @Override
     public boolean onMarkerClick(Marker marker) {
         behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        title_sheet.setText(marker.getTitle());
-        if (marker.getTitle().equals("Nouveau")) {  // nouveau marqueur ajouté par l'utilisateur
+        if (marker.getTitle().equals("Nouveau"))  // nouveau marqueur ajouté par l'utilisateur
+        {
             add_fab.setVisibility(View.VISIBLE);
+            btn_signal.setVisibility(View.GONE);
+
             selectedMarker = marker;                // pour envoyer avec le bouton +
-            desc_sheet.setText("Appuyez sur le + pour ajouter une nouvelle zone de danger ");
-        } else {                                    // marqueur de la BDD
+            sheet_title.setText(marker.getTitle());
+            sheet_desc.setText("Appuyez sur le + pour ajouter une nouvelle zone de danger ");
+            sheet_address.setText(marker.getSnippet());
+        }
+        else {                                    // Marker en bdd
             add_fab.setVisibility(View.GONE);
-            if (marker.getSnippet() != null) {
-                desc_sheet.setText(marker.getSnippet());
-            }
+            btn_signal.setVisibility(View.VISIBLE);
+            selectedZone = mapsController.getZone(Integer.parseInt(marker.getTitle()));
+
+            sheet_title.setText(selectedZone.getTitle());
+            sheet_desc.setText(selectedZone.getDescription());
+            sheet_address.setText(selectedZone.getAddress());
+
         }
 
         return true;
@@ -289,6 +321,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Bundle extras = new Bundle();
         extras.putDouble("latitude", selectedMarker.getPosition().latitude);
         extras.putDouble("longitude", selectedMarker.getPosition().longitude);
+        extras.putString("address", selectedMarker.getSnippet());
         intent.putExtras(extras);
         startActivity(intent);
 
@@ -300,6 +333,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.addMarker(new MarkerOptions()
                 .position(latLng)
                 .title("Nouveau")
+                .snippet(mapsController.getAddress(latLng.latitude,latLng.longitude, ctx))
                 .draggable(true)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
     }
@@ -335,6 +369,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
     }
+
+
 
 
 }
