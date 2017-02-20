@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.thenry.ridesafe.ProposActivity">
+    tools:context="com.example.thenry.ridesafe.activities.ProposActivity">
 
     <TextView
         android:id="@+id/propos1"
@@ -16,13 +16,13 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
         android:layout_centerHorizontal="true"
-        android:text="Application bénévole créée dans le but d'augmenter la sécurité de mes collègues motards face au mauvais état de la chaussée."/>
+        android:text="@string/app_context"/>
     <TextView
         android:layout_width="400dp"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_margin="20dp"
         android:layout_below="@+id/propos1"
-        android:text="Pour toute question me contacter sur  emaildedémo@gmail.com"/>
+        android:text="@string/app_contact"/>
 
 </RelativeLayout>

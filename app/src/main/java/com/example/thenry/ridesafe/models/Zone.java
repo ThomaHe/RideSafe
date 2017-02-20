@@ -1,4 +1,4 @@
-package com.example.thenry.ridesafe;
+package com.example.thenry.ridesafe.models;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;

@@ -65,7 +65,8 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
                         android:layout_centerHorizontal="true"
-                        android:text="Zone disparue"/>
+                        android:backgroundTint="@color/red"
+                        android:text="@string/signalButton"/>
 
                 </RelativeLayout>
 

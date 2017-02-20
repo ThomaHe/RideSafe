@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">RideSafe</string>
+    <string name="title_activity_maps">Carte</string>
+
+    <!--Maps Activity -->
+    <string name="thx_signal">Merci du signalement</string>
+    <string name="signalButton">Zone disparue</string>
+    <string name="noZones">Pas de zones à afficher</string>
+    <string name="addZone">Appuyez sur le + pour ajouter une nouvelle zone</string>
+    <string name="newZone">Nouveau</string>
+
+    <!--Form Activity -->
+    <string name="address">Adresse</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="description">Description</string>
+    <string name="hint_title">Titre de la zone</string>
+    <string name="submit">Enregistrer</string>
+
+    <!--Details Activity -->
+    <string name="app_context"> Application bénévole créée dans le but d\'augmenter la sécurité des motards face au mauvais état de la chaussée, et de leur permettre de partager leurs points d\'interêt.</string>
+    <string name="app_contact">Pour toute question ou remarque sur un bug, me contacter sur  emaildedémo@gmail.com, ça me permettra de les résoudre plus rapidement</string>
+
+</resources>

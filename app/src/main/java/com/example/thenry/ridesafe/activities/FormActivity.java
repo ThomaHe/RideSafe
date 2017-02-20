@@ -1,9 +1,12 @@
-package com.example.thenry.ridesafe;
+package com.example.thenry.ridesafe.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.example.thenry.ridesafe.R;
+import com.example.thenry.ridesafe.models.Zone;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -45,9 +48,14 @@ public class FormActivity extends AppCompatActivity {
         longitude = extras.getDouble("longitude");
         address = extras.getString("address");
 
-        form_address.setText("Adresse : " + address);
-        form_lat.setText("Latitude : " + latitude);
-        form_longi.setText("Longitude : " + longitude);
+        // on concatène les strings en dehors des fonctions
+        String str_address =getString(R.string.address)+ address;
+        String str_longitude =getString(R.string.longitude)+ latitude;
+        String str_latitude =getString(R.string.latitude)+ longitude;
+
+        form_address.setText(str_address);
+        form_lat.setText(str_latitude);
+        form_longi.setText(str_longitude);
 
     }
 

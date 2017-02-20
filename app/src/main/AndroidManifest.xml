@@ -41,12 +41,12 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name=".activities.MapsActivity"
             android:label="RideSafe"></activity>
         <activity
-            android:name=".ProposActivity"
+            android:name=".activities.ProposActivity"
             android:label="A propos" />
-        <activity android:name=".SplashScreenActivity">
+        <activity android:name=".activities.SplashScreenActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -54,7 +54,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".FormActivity"
+            android:name=".activities.FormActivity"
             android:label="Nouvelle zone de danger"></activity>
     </application>
 

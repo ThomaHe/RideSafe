@@ -1,4 +1,24 @@
 <resources>
     <string name="app_name">RideSafe</string>
     <string name="title_activity_maps">Map</string>
+
+    <!--Maps Activity -->
+    <string name="thx_signal">Thank you for your participation</string>
+    <string name="signalButton">Zone missing</string>
+    <string name="noZones">Nothing to show</string>
+    <string name="addZone">Click on the + to add a new zone</string>
+    <string name="newZone">New</string>
+
+    <!--Form Activity -->
+    <string name="address">Address</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="description">Description</string>
+    <string name="hint_title">Title of the zone</string>
+    <string name="submit">Submit</string>
+
+    <!--Details Activity -->
+    <string name="app_context">Voluntary app created to increase the safety of the riders and help them share their spots of interest.</string>
+    <string name="app_contact">For any question or remarks on the app, please email me at emaildedémo@gmail.com , i will try to resolve any issue you can have</string>
+
 </resources>

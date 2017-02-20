@@ -4,6 +4,8 @@ import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 
+import com.example.thenry.ridesafe.models.Zone;
+
 import java.io.IOException;
 import java.util.List;
 

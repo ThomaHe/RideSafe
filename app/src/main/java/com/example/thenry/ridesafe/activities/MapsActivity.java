@@ -1,4 +1,4 @@
-package com.example.thenry.ridesafe;
+package com.example.thenry.ridesafe.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -25,6 +25,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.thenry.ridesafe.MapsController;
+import com.example.thenry.ridesafe.R;
+import com.example.thenry.ridesafe.models.Zone;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -171,7 +174,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
                         }
                         else{
-                            Toast.makeText(getApplicationContext(), "Adresse inconnue", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), "Adresse inconnue", Toast.LENGTH_SHORT).show();
                             return false;
                         }
                     }
@@ -297,8 +300,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             btn_signal.setVisibility(View.GONE);
 
             selectedMarker = marker;                // pour envoyer avec le bouton +
-            sheet_title.setText(marker.getTitle());
-            sheet_desc.setText("Appuyez sur le + pour ajouter une nouvelle zone de danger ");
+            sheet_title.setText(getString(R.string.newZone));
+            sheet_desc.setText(getString(R.string.addZone));
             sheet_address.setText(marker.getSnippet());
         }
         else {                                    // Marker en bdd
@@ -325,6 +328,29 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         intent.putExtras(extras);
         startActivity(intent);
 
+    }
+
+    @OnClick(R.id.btn_signal)
+    public void signal(){  //TODO : vérifier que l'utilisateur n'ai pas déja signalé la zone
+        final int count = (selectedZone.getCount_delete())+1;
+        if(count<3){  // on supprime le marqueur après 3 signalement
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    selectedZone.setCount_delete(count);  // incrémente le compteur
+                    realm.copyToRealmOrUpdate(selectedZone);
+                }
+            });
+        }else{ // déja signalé 3 fois
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    selectedZone.deleteFromRealm();  // on l'efface
+                }
+            });
+            behavior.setState(BottomSheetBehavior.STATE_HIDDEN); // on cache la Bottom Sheet vidée
+        }
+        Toast.makeText(getApplicationContext(), getString(R.string.thx_signal), Toast.LENGTH_SHORT).show();
     }
 
 
@@ -365,7 +391,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mMap.addMarker(new MarkerOptions().position(latLng).title(String.valueOf(zone.getId())));
             }
         }catch (NullPointerException e){
-            Log.e("NULL", "Pas de zones à afficher");
+            Log.e("NULL", getString(R.string.noZones));
         }
 
     }

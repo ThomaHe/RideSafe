@@ -1,9 +1,11 @@
-package com.example.thenry.ridesafe;
+package com.example.thenry.ridesafe.activities;
 
 import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.example.thenry.ridesafe.R;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
