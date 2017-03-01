@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">RideSafe</string>
     <string name="title_activity_maps">Map</string>
+    <string name="title_activity_form">New zone</string>
+    <string name="title_activity_about">About</string>
 
     <!--Maps Activity -->
     <string name="thx_signal">Thank you for your participation</string>
@@ -8,17 +10,26 @@
     <string name="noZones">Nothing to show</string>
     <string name="addZone">Click on the + to add a new zone</string>
     <string name="newZone">New</string>
+    <string name="unknown">Unknown address</string>
+    <string name="alreadySignaled">You already signaled this zone as missing</string>
+    <string name="search_hint">Address</string>
+    <string name="updateMap">Update map</string>
 
     <!--Form Activity -->
-    <string name="address">Address</string>
-    <string name="latitude">Latitude</string>
-    <string name="longitude">Longitude</string>
+    <string name="address">Address :  </string>
+    <string name="latitude">Latitude :  </string>
+    <string name="longitude">Longitude :  </string>
     <string name="description">Description</string>
     <string name="hint_title">Title of the zone</string>
     <string name="submit">Submit</string>
+    <string name="type">Type :</string>
 
-    <!--Details Activity -->
-    <string name="app_context">Voluntary app created to increase the safety of the riders and help them share their spots of interest.</string>
+    <!--Propos Activity -->
+    <string name="app_context">Voluntary app created to increase the safety of the riders and help them share their spots of interest dedicated to motorcycles.</string>
     <string name="app_contact">For any question or remarks on the app, please email me at emaildedémo@gmail.com , i will try to resolve any issue you can have</string>
+    <string name="app_howTo1">To add a new zone, do a long click on the map, a blue marker will appear. Click on the marker then on the + to access the form.</string>
+    <string name="app_howTo2">There are 4 types of zones : danger, shop, mechanic and bar/restaurant; each has its own icon on the map.</string>
+
+
 
 </resources>

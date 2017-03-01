@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +32,6 @@ import com.example.thenry.ridesafe.models.Zone;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -43,13 +43,13 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
-import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleApiClient.ConnectionCallbacks,
@@ -59,11 +59,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     public Context ctx;
-    public MapsController mapsController;
+    private MapsController mapsController;
 
     private Realm realm;
-    public Marker selectedMarker;
-    public Zone selectedZone;
+    private Marker selectedMarker;
+    private Zone selectedZone;
+    private List<Integer> signaledZones;
 
     private View bottomSheet;
     private BottomSheetBehavior behavior;
@@ -71,21 +72,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     FloatingActionButton add_fab;
     @BindView(R.id.title_sheet)
     TextView sheet_title;
+    @BindView(R.id.img_sheet)ImageView sheet_image;
     @BindView(R.id.desc_sheet)
     TextView sheet_desc;
     @BindView(R.id.address_sheet)
     TextView sheet_address;
     @BindView(R.id.btn_signal)
     Button btn_signal;
-
     @BindView(R.id.address_search)
     EditText address_search;
-
-
-    // variables pour la mise à jour de la localisation
-    private LocationRequest mLocationRequest;
-    private boolean mLocationUpdateState;
-    private static final int REQUEST_CHECK_SETTINGS = 2;
 
     final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
 
@@ -96,15 +91,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_maps);
         ButterKnife.bind(this);
 
-        RealmConfiguration config = new RealmConfiguration  // a modifier une fois que l'appli part en prod, il faudra fournir une migration
-                .Builder()
-                .deleteRealmIfMigrationNeeded()
-                .build();
-        realm = Realm.getInstance(config);
+        realm = Realm.getDefaultInstance();
         ctx = MapsActivity.this;
         mapsController = new MapsController(realm);
 
+        signaledZones = new ArrayList<>();
+
         getSupportActionBar().show();
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -163,7 +157,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        if(addressList.size()!=0) {
+                        if (addressList.size() != 0) {
                             Address address = addressList.get(0);
                             LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                             mMap.addMarker(new MarkerOptions()
@@ -172,9 +166,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     .draggable(true)
                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                             mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-                        }
-                        else{
-                            Toast.makeText(getApplicationContext(), "Adresse inconnue", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getApplicationContext(), getString(R.string.unknown), Toast.LENGTH_SHORT).show();
                             return false;
                         }
                     }
@@ -240,15 +233,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_propos) {
-            Intent newIntent = new Intent(this, ProposActivity.class);
+        if (id == R.id.action_about) {
+            Intent newIntent = new Intent(this, AboutActivity.class);
             startActivity(newIntent);
         }
         if (id == R.id.action_updateMap) {
             mMap.clear();
             generateMap();
         }
-        if (id == R.id.action_deleteRealm)  // à virer avant la prod
+        if (id == R.id.action_deleteRealm)  // TODO : à virer avant la prod
         {
 
             realm.executeTransaction(new Realm.Transaction() {
@@ -298,17 +291,34 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         {
             add_fab.setVisibility(View.VISIBLE);
             btn_signal.setVisibility(View.GONE);
+            sheet_image.setVisibility(View.GONE);
 
             selectedMarker = marker;                // pour envoyer avec le bouton +
             sheet_title.setText(getString(R.string.newZone));
             sheet_desc.setText(getString(R.string.addZone));
             sheet_address.setText(marker.getSnippet());
-        }
-        else {                                    // Marker en bdd
+        } else {                                    // Marker en bdd
             add_fab.setVisibility(View.GONE);
             btn_signal.setVisibility(View.VISIBLE);
+            sheet_image.setVisibility(View.VISIBLE);
+
             selectedZone = mapsController.getZone(Integer.parseInt(marker.getTitle()));
 
+            switch (selectedZone.getType()){  //0: risk, 1: shop, 2: mechanic, 3: bar/restaurant
+                case 0:
+                    sheet_image.setImageDrawable(getDrawable(R.drawable.ic_warning));
+                    break;
+                case 1:
+                    sheet_image.setImageDrawable(getDrawable(R.drawable.ic_local_grocery_store));
+                    break;
+                case 2:
+                    sheet_image.setImageDrawable(getDrawable(R.drawable.ic_build));
+                    break;
+                case 3:
+                    sheet_image.setImageDrawable(getDrawable(R.drawable.ic_local_bar));
+                    break;
+
+            }
             sheet_title.setText(selectedZone.getTitle());
             sheet_desc.setText(selectedZone.getDescription());
             sheet_address.setText(selectedZone.getAddress());
@@ -331,26 +341,33 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @OnClick(R.id.btn_signal)
-    public void signal(){  //TODO : vérifier que l'utilisateur n'ai pas déja signalé la zone
-        final int count = (selectedZone.getCount_delete())+1;
-        if(count<3){  // on supprime le marqueur après 3 signalement
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    selectedZone.setCount_delete(count);  // incrémente le compteur
-                    realm.copyToRealmOrUpdate(selectedZone);
-                }
-            });
-        }else{ // déja signalé 3 fois
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    selectedZone.deleteFromRealm();  // on l'efface
-                }
-            });
-            behavior.setState(BottomSheetBehavior.STATE_HIDDEN); // on cache la Bottom Sheet vidée
+    public void signal() {
+        final int count = (selectedZone.getCount_delete()) + 1;
+        if (signaledZones.contains(selectedZone.getId())) // verifie que l'utilisateur ne signale pas plusieurs fois une zone
+        {
+            Toast.makeText(getApplicationContext(), getString(R.string.alreadySignaled), Toast.LENGTH_SHORT).show();
         }
-        Toast.makeText(getApplicationContext(), getString(R.string.thx_signal), Toast.LENGTH_SHORT).show();
+        else {  // pas encore signalé
+            if (count < 3) {  // signalé moins de 3 fois
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        selectedZone.setCount_delete(count);  // incrémente le compteur
+                        realm.copyToRealmOrUpdate(selectedZone);
+                    }
+                });
+                signaledZones.add(selectedZone.getId()); // ajout à la liste
+            } else { // on supprime le marqueur après 3 signalement
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        selectedZone.deleteFromRealm();  // on l'efface
+                    }
+                });
+                behavior.setState(BottomSheetBehavior.STATE_HIDDEN); // on cache la Bottom Sheet vidée
+            }
+            Toast.makeText(getApplicationContext(), getString(R.string.thx_signal), Toast.LENGTH_SHORT).show();
+        }
     }
 
 
@@ -359,7 +376,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.addMarker(new MarkerOptions()
                 .position(latLng)
                 .title("Nouveau")
-                .snippet(mapsController.getAddress(latLng.latitude,latLng.longitude, ctx))
+                .snippet(mapsController.getAddress(latLng.latitude, latLng.longitude, ctx))
                 .draggable(true)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
     }
@@ -383,20 +400,38 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    public void generateMap() {
+    private void generateMap() {
         RealmResults<Zone> allZones = realm.where(Zone.class).findAll();
         try {
             for (Zone zone : allZones) {
                 LatLng latLng = new LatLng(zone.getLatitude(), zone.getLongitude());
-                mMap.addMarker(new MarkerOptions().position(latLng).title(String.valueOf(zone.getId())));
+
+                switch (zone.getType()) {  //0: risk, 1: shop, 2: mechanic, 3: bar/restaurant
+                    case 0:
+                        mMap.addMarker(new MarkerOptions().position(latLng).title(String.valueOf(zone.getId())));
+                        break;
+                    case 1:
+                        mMap.addMarker(new MarkerOptions().position(latLng)
+                                .title(String.valueOf(zone.getId()))
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_grocery_store)));
+                        break;
+                    case 2:
+                        mMap.addMarker(new MarkerOptions().position(latLng)
+                                .title(String.valueOf(zone.getId()))
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_build)));
+                        break;
+                    case 3:
+                        mMap.addMarker(new MarkerOptions().position(latLng)
+                                .title(String.valueOf(zone.getId()))
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_bar)));
+                        break;
+                }
             }
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             Log.e("NULL", getString(R.string.noZones));
         }
 
     }
-
-
 
 
 }

@@ -18,7 +18,7 @@
         android:required="true" />
 
     <application
-        android:name=".MyApplication"
+        android:name=".RideSafeApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -42,20 +42,20 @@
 
         <activity
             android:name=".activities.MapsActivity"
-            android:label="RideSafe"></activity>
+            android:label="@string/title_activity_maps"/>
         <activity
-            android:name=".activities.ProposActivity"
-            android:label="A propos" />
+            android:name=".activities.AboutActivity"
+            android:label="@string/title_activity_about" />
+
         <activity android:name=".activities.SplashScreenActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".activities.FormActivity"
-            android:label="Nouvelle zone de danger"></activity>
+            android:label="@string/title_activity_form"/>
     </application>
 
 </manifest>

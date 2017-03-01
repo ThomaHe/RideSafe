@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="type_array">
+        <item>Zone dangereuse</item>
+        <item>Magasin</item>
+        <item>Atelier</item>
+        <item>Bar/Restaurant</item>
+    </string-array>
+</resources>

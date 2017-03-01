@@ -10,10 +10,9 @@ import java.io.IOException;
 import java.util.List;
 
 import io.realm.Realm;
-import io.realm.RealmResults;
 
 /**
- * Created by thenry on 24/01/2017.
+  Created by thenry on 24/01/2017.
  */
 
 public class MapsController {
@@ -25,29 +24,24 @@ public class MapsController {
     }
 
     public Zone getZone(int id) {
-        RealmResults<Zone> result = realm.where(Zone.class)
+        Zone zone = realm.where(Zone.class)
                 .equalTo("id", id)
-                .findAll();
-        Zone zone = result.first();
+                .findFirst();
         return zone;
     }
 
     public String getAddress (double latitude, double longitude, Context ctx) // récupère une string adresse
     {
         String address = "Adresse inconnue";
-        List<Address> listAddress = null;
         Geocoder geocoder = new Geocoder(ctx);
         try {
-            listAddress = geocoder.getFromLocation(latitude,longitude, 1);
+            List<Address> listAddress = geocoder.getFromLocation(latitude,longitude, 1);
             if(listAddress.size()!=0) {
                 address = listAddress.get(0).getAddressLine(0)+" "+listAddress.get(0).getAddressLine(1);
             }
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (NullPointerException e){
-            e.printStackTrace();
         }
-
         return address;
     }
 

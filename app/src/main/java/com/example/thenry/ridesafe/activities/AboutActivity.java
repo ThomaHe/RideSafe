@@ -7,7 +7,7 @@ import android.view.MenuItem;
 
 import com.example.thenry.ridesafe.R;
 
-public class ProposActivity extends AppCompatActivity {
+public class AboutActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

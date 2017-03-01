@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">RideSafe</string>
     <string name="title_activity_maps">Carte</string>
+    <string name="title_activity_form">Nouvelle zone</string>
+    <string name="title_activity_about">A propos</string>
 
     <!--Maps Activity -->
     <string name="thx_signal">Merci du signalement</string>
@@ -8,17 +10,24 @@
     <string name="noZones">Pas de zones à afficher</string>
     <string name="addZone">Appuyez sur le + pour ajouter une nouvelle zone</string>
     <string name="newZone">Nouveau</string>
+    <string name="unknown">Adresse inconnue</string>
+    <string name="alreadySignaled">Vous avez déja signalé cette zone</string>
+    <string name="search_hint">Adresse</string>
+    <string name="updateMap">Actualiser la carte</string>
 
     <!--Form Activity -->
-    <string name="address">Adresse</string>
-    <string name="latitude">Latitude</string>
-    <string name="longitude">Longitude</string>
+    <string name="address">Adresse : </string>
+    <string name="latitude">Latitude : </string>
+    <string name="longitude">Longitude : </string>
     <string name="description">Description</string>
     <string name="hint_title">Titre de la zone</string>
     <string name="submit">Enregistrer</string>
+    <string name="type">Type :</string>
 
-    <!--Details Activity -->
-    <string name="app_context"> Application bénévole créée dans le but d\'augmenter la sécurité des motards face au mauvais état de la chaussée, et de leur permettre de partager leurs points d\'interêt.</string>
+    <!--Propos Activity -->
+    <string name="app_context">Application bénévole créée dans le but d\'augmenter la sécurité des motards face au mauvais état de la chaussée, et de leur permettre de partager leurs points d\'interêt dédiés à la moto.</string>
     <string name="app_contact">Pour toute question ou remarque sur un bug, me contacter sur  emaildedémo@gmail.com, ça me permettra de les résoudre plus rapidement</string>
+    <string name="app_howTo1">Pour ajouter une nouvelle zone, faites un clic long sur la carte, un marqueur bleu va apparaître, en cliquand dessus puis sur le +, vous accéderez au formulaire d\'ajout.</string>
+    <string name="app_howTo2">"Les zones sont de 4 types : danger, magasin, atelier et bar/restaurant; ils ont chacun leur icône dédié sur la carte "</string>
 
 </resources>

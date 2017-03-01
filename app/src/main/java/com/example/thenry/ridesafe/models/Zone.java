@@ -4,20 +4,21 @@ import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 /**
- * Created by thenry on 27/01/2017.
+  Created by thenry on 27/01/2017.
  */
 
 public class Zone extends RealmObject {
 
     @PrimaryKey
-    public int id;
-    public String title;
-    public String description;
-    public double latitude;
-    public double longitude;
-    public String address;
-    public String date;
-    public int count_delete;
+    private int id;
+    private String title;
+    private String description;
+    private double latitude;
+    private double longitude;
+    private String address;
+    private String date;
+    private int count_delete;
+    private int type;  // 0: risk, 1: shop, 2: mechanic, 3: bar/restaurant
 
     public int getId() {
         return id;
@@ -81,5 +82,13 @@ public class Zone extends RealmObject {
 
     public void setCount_delete(int count_delete) {
         this.count_delete = count_delete;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 }
